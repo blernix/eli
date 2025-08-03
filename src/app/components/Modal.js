@@ -1,20 +1,19 @@
 "use client";
 import { useEffect } from "react";
+import Image from "next/image"; // Ajout de l'import pour le composant Image de Next.js
 
 function decodeHTMLEntities(str) {
-  if (typeof window === "undefined") return str;
+  if (typeof window === "undefined" || !str) return str;
   const txt = document.createElement("textarea");
   txt.innerHTML = str;
   return txt.value;
 }
 
 export default function Modal({ oeuvre, close, previous, next }) {
-  const imageUrl = oeuvre.image
-    ? `${process.env.NEXT_PUBLIC_DIRECTUS_STORAGE}/uploads/${oeuvre.image}`
-    : "/images/placeholder.jpg";
+  const STORAGE_URL = process.env.NEXT_PUBLIC_DIRECTUS_STORAGE;
 
   const cleanDescription = decodeHTMLEntities(
-    oeuvre.description.replace(/<[^>]+>/g, "")
+    oeuvre.description?.replace(/<[^>]+>/g, "") || ""
   );
 
   useEffect(() => {
@@ -40,13 +39,30 @@ export default function Modal({ oeuvre, close, previous, next }) {
 
         {/* Zone scrollable */}
         <div className="overflow-auto mt-2 space-y-4">
-          {/* Image + navigation */}
+          {/* Média + navigation */}
           <div className="relative">
-            <img
-              src={imageUrl}
-              alt={oeuvre.titre}
-              className="max-h-[50vh] w-full object-contain rounded-lg"
-            />
+            {oeuvre.image && (
+              // Utilisation du composant Image de Next.js pour l'optimisation
+              <Image
+                src={`${STORAGE_URL}/uploads/${oeuvre.image}`}
+                alt={oeuvre.titre}
+                width={700} // Ajuster la taille pour la modale
+                height={500}
+                className="max-h-[50vh] w-full object-contain rounded-lg"
+              />
+            )}
+            {oeuvre.video && (
+              <video
+                src={`${STORAGE_URL}/uploads/${oeuvre.video}`}
+                title={oeuvre.titre}
+                controls // Ajout des contrôles pour la lecture/pause
+                autoPlay
+                loop
+                muted={false} // Le son peut être activé dans la modale
+                playsInline
+                className="max-h-[50vh] w-full object-contain rounded-lg"
+              />
+            )}
 
             <button
               onClick={previous}

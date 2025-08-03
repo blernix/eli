@@ -23,7 +23,7 @@ export async function GET(req) {
     ] = await Promise.all([
       fetch(`${API_URL}/items/couverture?fields=image.filename_disk`, { headers }),
       fetch(`${API_URL}/items/categories_oeuvres?fields=id,titre`, { headers }),
-      fetch(`${API_URL}/items/oeuvres?fields=id,titre,description,image.filename_disk,categorie_id.id`, { headers }),
+      fetch(`${API_URL}/items/oeuvres?fields=id,titre,description,image.filename_disk,videos.filename_disk,categorie_id.id`, { headers }), 
       fetch(`${API_URL}/items/description?fields=contenu`, { headers }),
       fetch(`${API_URL}/items/photo_profil?fields=image.filename_disk`, { headers }),
       fetch(`${API_URL}/items/notification?filter[activation][_eq]=true&filter[status][_eq]=published&fields=type,message,date_start,start_end`, { headers }),
@@ -57,6 +57,7 @@ export async function GET(req) {
         titre: oeuvre.titre,
         description: oeuvre.description,
         image: oeuvre.image?.filename_disk || null,
+        video: oeuvre.videos?.filename_disk || null, // On ajoute le champ video
         categorie_id: oeuvre.categorie_id?.id || null,
       })),
       artiste: {
